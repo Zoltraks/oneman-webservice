@@ -46,3 +46,8 @@ Sleeps for specified time in seconds and then returns nothing.
 * Throw
 
 Throws internal exception.
+
+```
+System.Exception: Internal exception
+   at OneManWebService.Test.Throw() in ...\Test.asmx.cs:line 49
+```
