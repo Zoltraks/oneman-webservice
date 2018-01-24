@@ -7,6 +7,40 @@ namespace OneManWebService.Worker
 {
     public class Context: IDisposable
     {
+        /// <summary>
+        /// Worker class interface
+        /// </summary>
+        public interface IWorker
+        {
+            void Work(Context context);
+        }
+
+        /// <summary>
+        /// Processing state
+        /// </summary>
+        public enum State
+        {
+            /// <summary>
+            /// Object not exists
+            /// </summary>
+            NotExists,
+            
+            /// <summary>
+            /// Object is waiting to be processed
+            /// </summary>
+            RequestWaiting,
+
+            /// <summary>
+            /// Object is currently being processed
+            /// </summary>
+            CurrentlyProcesing,
+
+            /// <summary>
+            /// Object was processed and response is ready
+            /// </summary>
+            ResponseReady,
+        }
+
         private readonly Energy.Base.Lock _QueueLock = new Energy.Base.Lock();
 
         private readonly Energy.Base.Lock _ThreadLock = new Energy.Base.Lock();
@@ -31,16 +65,30 @@ namespace OneManWebService.Worker
 
         private int PurgeTimerLive = 30;
 
+        private System.Timers.Timer SpawnTimer = new System.Timers.Timer();
+
+        private int SpawnTimerInterval = 10;
+
+        private bool SpawnImmediate = false;
+
         public Context(Type workerClassType)
         {
             WorkerClassType = workerClassType;
             PurgeTimer.Interval = PurgeTimerInterval * 1000;
             PurgeTimer.Elapsed += PurgeTimer_Elapsed;
+            SpawnTimer.Interval = SpawnTimerInterval * 1000;
+            SpawnTimer.Elapsed += SpawnTimer_Elapsed;
+            SpawnTimer.Start();
         }
 
         private void PurgeTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             Purge();
+        }
+
+        private void SpawnTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            Spawn();
         }
 
         private void Spawn()
@@ -55,7 +103,7 @@ namespace OneManWebService.Worker
                 if (Thread != null && Thread.IsAlive)
                     return;
                 Worker = Activator.CreateInstance(WorkerClassType);
-                Thread = new Thread(() => ((IWork)Worker).Work(this));
+                Thread = new Thread(() => ((IWorker)Worker).Work(this));
                 Thread.Start();
                 if (!Thread.IsAlive)
                 {
@@ -122,7 +170,10 @@ namespace OneManWebService.Worker
             }
             finally
             {
-                Spawn();
+                if (SpawnImmediate)
+                {
+                    Spawn();
+                }
             }
             return true;
         }
@@ -165,6 +216,20 @@ namespace OneManWebService.Worker
                     return null;
                 return ResponseQueue[key];
             }
+        }
+
+        public State GetState(string key)
+        {
+            lock (_QueueLock)
+            {
+                if (RequestQueue.ContainsKey(key))
+                    return State.RequestWaiting;
+                if (ProcessingQueue.Contains(key))
+                    return State.CurrentlyProcesing;
+                if (ResponseQueue.ContainsKey(key))
+                    return State.ResponseReady;
+            }
+            return State.NotExists;
         }
 
         public void Dispose()

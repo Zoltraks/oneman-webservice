@@ -28,5 +28,22 @@ namespace OneManWebService
             Class.Message message = (Class.Message)Static.MessageProcessingQueue.GetResponse(key);
             return message;
         }
+
+        [WebMethod]
+        public string State([XmlElement("Key")] string key)
+        {
+            switch (Static.MessageProcessingQueue.GetState(key))
+            {
+                default:
+                case Worker.Context.State.NotExists:
+                    return "Message not exists";
+                case Worker.Context.State.RequestWaiting:
+                    return "Message is waiting to be processed";
+                case Worker.Context.State.CurrentlyProcesing:
+                    return "Message is currently being processed";
+                case Worker.Context.State.ResponseReady:
+                    return "Message was processed and response is ready";
+            }
+        }
     }
 }

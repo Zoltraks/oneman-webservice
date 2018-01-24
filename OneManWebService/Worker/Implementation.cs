@@ -5,7 +5,7 @@ using System.Web;
 
 namespace OneManWebService.Worker
 {
-    public class Implementation: IWork
+    public class Implementation: Worker.Context.IWorker
     {
         public void Work(Context context)
         {

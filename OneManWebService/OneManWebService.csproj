@@ -87,7 +87,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Worker\Implementation.cs" />
-    <Compile Include="Worker\IWork.cs" />
     <Compile Include="Worker\Context.cs" />
   </ItemGroup>
   <ItemGroup>
