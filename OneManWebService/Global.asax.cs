@@ -12,6 +12,7 @@ namespace OneManWebService
         protected void Application_Start(object sender, EventArgs e)
         {
             Energy.Core.Application.SetDefaultLanguage();
+            Energy.Core.Bug.Trace.On();
             AppDomain.CurrentDomain.UnhandledException += Common.UnhandledExceptionEventHandler;
         }
 

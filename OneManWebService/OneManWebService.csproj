@@ -20,6 +20,12 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>4.0</OldToolsVersion>
+    <Use64BitIISExpress />
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,9 +45,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Energy.Core, Version=2018.1.18.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Energy.Core.18.1.0\lib\net20\Energy.Core.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Energy.Core, Version=2018.1.22.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Energy.Core.18.01.1\lib\net20\Energy.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -54,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
+    <Content Include="Message.asmx" />
     <Content Include="Test.asmx" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
@@ -64,22 +70,31 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Class\Message.cs" />
     <Compile Include="Common.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Message.asmx.cs">
+      <DependentUpon>Message.asmx</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Static.cs" />
     <Compile Include="Test.asmx.cs">
       <DependentUpon>Test.asmx</DependentUpon>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Worker\Implementation.cs" />
+    <Compile Include="Worker\IWork.cs" />
+    <Compile Include="Worker\Context.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="packages.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
